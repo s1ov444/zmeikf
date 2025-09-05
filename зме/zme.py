@@ -45,7 +45,17 @@ class Snake(GameSprite):
             self.dx = SQUARE_SIZE
             self.dy = 0   
 
+class Apple(GameSprite):
+    def __init__(self, pl_image):
+        super().__init__(pl_image, 0, 0)
+        self.respawn()
+    
+    def respawn(self):
+        self.rect.x = randrange(0, WIDIH - SQUARE_SIZE, SQUARE_SIZE)
+        self.rect.y = randrange(0, HEIGHT - SQUARE_SIZE, SQUARE_SIZE)
+
 head = Snake('head.png', 200, 250)
+apple = Apple('apple.png')
 clock = time.Clock()
 step_time = timer()
 running = True
@@ -66,5 +76,6 @@ while running:
             head.update()
             step_time = timer()
         head.draw_sprite()
+        apple.draw_sprite()
     display.update()
     clock.tick(FPS)
