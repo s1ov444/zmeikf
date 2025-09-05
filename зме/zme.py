@@ -22,9 +22,32 @@ class GameSprite(sprite.Sprite):
     def draw_sprite(self):
         W.blit(self.image, (self.rect.x, self.rect.y))
 
-head = GameSprite('head.png', 200, 250)
-clock = time.Clock()
+class Snake(GameSprite):
+    def __init__(self, pl_image, pl_x, pl_y):
+        super().__init__(pl_image, pl_x, pl_y)
+        self.dx = SQUARE_SIZE
+        self.dy = 0
+    def update(self):
+        self.rect.x += self.dx
+        self.rect.y += self.dy
+    def get_direction(self):
+        keys = key.get_pressed()
+        if keys[K_UP] and self.dy == 0:
+            self.dx = 0
+            self.dy = -SQUARE_SIZE
+        elif keys[K_DOWN] and self.dy == 0:
+            self.dx = 0
+            self.dy = SQUARE_SIZE
+        elif keys[K_LEFT] and self.dx == 0:
+            self.dx = -SQUARE_SIZE
+            self.dy = 0
+        elif keys[K_RIGHT] and self.dx == 0:
+            self.dx = SQUARE_SIZE
+            self.dy = 0   
 
+head = Snake('head.png', 200, 250)
+clock = time.Clock()
+step_time = timer()
 running = True
 finish = False
 while running:
@@ -34,8 +57,14 @@ while running:
             running = False
 
     if not finish:
+        cur_time = timer()
         W.blit(bg, (0, 0))
-        head.draw_sprite()
+        head.get_direction()
+        
 
+        if cur_time - step_time >= 0.5:
+            head.update()
+            step_time = timer()
+        head.draw_sprite()
     display.update()
     clock.tick(FPS)
