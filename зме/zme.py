@@ -8,12 +8,28 @@ FPS = 60
 
 font.init()
 game_font = font.Font(None, 50)
+small_font = font.Font(None, 36)
 text = game_font.render('You lose)', True, (225, 0, 0))
 
 W = display.set_mode((WIDIH, HEIGHT))
 display.set_caption('Змейка')
 
 bg = transform.scale(image.load('background.jpg'), (WIDIH, HEIGHT))
+
+def load_record():
+    try:
+        with open('record.txt', 'r') as file:
+            return int(file.read())
+    except:
+        return 0
+
+def save_record(value):
+    with open('record.txt', 'w') as file:
+        file.write(str(value))
+
+record = load_record()
+score = 0
+
 
 class GameSprite(sprite.Sprite):
     def __init__(self, pl_image, pl_x, pl_y):
@@ -96,6 +112,7 @@ while running:
 
             if head.rect.colliderect(apple.rect):
                 apple.respawn()
+                score += 1
                 last_part = snake[-1]
                 new_x, new_y = last_part.rect.x, last_part.rect.y 
 
@@ -114,17 +131,26 @@ while running:
         for part in snake[1:]:
             if head.rect.colliderect(part.rect):
                 finish = True
-                W.blit(text, (250, 200))
-
-
-        
-
-        
+                if score > record:
+                    record = score
+                    save_record(record)
         head.draw_sprite()
         apple.draw_sprite()
 
         for part in snake:
             part.draw_sprite()
+        
+        score_text = small_font.render(f'Очки: {score}', True, (255, 215, 0))
+        record_text = small_font.render(f'Рекорд: {record}', True, (255, 215, 0))
+        W.blit(score_text, (10, 20))
+        W.blit(record_text, (10, 50))
+
+    else:
+        lose_text = game_font.render('You lose', True, (255, 0, 0))
+        W.blit(lose_text, (255, 200))
+        
+
+        
 
     display.update()
     clock.tick(FPS)
